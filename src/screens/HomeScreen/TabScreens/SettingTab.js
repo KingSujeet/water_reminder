@@ -2,10 +2,11 @@ import React, { useState, useEffect} from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import RNPickerSelect from 'react-native-picker-select';
 import { openDatabase } from 'react-native-sqlite-storage'
+import PushNotification from 'react-native-push-notification';
 
-import Colors from '../../../assets/colors'
-import Strings from '../../../assets/strings'
-
+import { Strings, Colors } from '../../../assets';
+import { clearDrinkInterval, showDrinkPopup, showNotification } from '../../../utills/UtillFunctions';
+import { updateTableData } from '../../../db/DbFunctions';
 
 var db = openDatabase({ name: 'UserDatabase.db' });
 
@@ -19,12 +20,11 @@ const SettingTab = () => {
         { label: 'Arabic', value: 'Arabic' },
     ]
     const reminderItems=[
-        { label: '30 Minutes', value: '30 ' },
-        { label: '45 Minutes', value: '45 ' },
-        { label: '60 Minutes', value: '60 ' },
-        { label: '90 Minutes', value: '90 ' },
+        { label: '1 Minutes', value: 1 },
+        { label: '45 Minutes', value: 45 },
+        { label: '60 Minutes', value: 60 },
+        { label: '90 Minutes', value: 90 },
     ]
-
 
 
     const readReminderData = () => {
@@ -38,6 +38,7 @@ const SettingTab = () => {
                     if (len > 0) {
                         console.log("data: " + results.rows.item(0).reminder);
                         setReminder(results.rows.item(0).reminder + " Minutes")
+                        setReminderValue(results.rows.item(0).reminder)
                     } else {
                       alert('No user found');
                     }
@@ -46,20 +47,75 @@ const SettingTab = () => {
               });
     }
 
+    const updateReminderSchedule = () => {
+        // db.transaction((tx) => {
+        //   tx.executeSql(
+        //     'UPDATE table_user set is_reminder_sch=?',
+        //     ['true'],
+        //     (tx, results) => {
+        //       console.log('Results', results.rowsAffected);
+        //       if (results.rowsAffected > 0) {
+        //       } else alert('Updation Failed');
+        //     }
+        //   );
+        // });
+
+        updateTableData(
+            'UPDATE table_user set is_reminder_sch=?',
+            ['true'],
+            ).then(()=>{
+              
+           })        
+  
+      }
+      
+
     const updateReminder = (value) => {
+        PushNotification.cancelAllLocalNotifications()
+        clearDrinkInterval()
+        // db.transaction((tx) => {
+        //     tx.executeSql(
+        //       'UPDATE table_user set reminder=?, is_reminder_sch=?',
+        //       [value, 'false'],
+        //       (tx, results) => {
+        //         console.log('Results', results.rowsAffected);
+        //         if (results.rowsAffected > 0) {
+        //             readReminderDataOnce()
+        //         } else alert('Updation Failed');
+        //       }
+        //     );
+        //   });
+
+        updateTableData(
+            'UPDATE table_user set reminder=?, is_reminder_sch=?',
+            [value, 'false'],
+            ).then(()=>{
+                readReminderDataOnce()
+           })
+
+    }
+
+    const readReminderDataOnce = () => {
         db.transaction((tx) => {
             tx.executeSql(
-              'UPDATE table_user set reminder=?',
-              [value],
+              'SELECT reminder FROM table_user',
+              [],
               (tx, results) => {
-                console.log('Results', results.rowsAffected);
-                if (results.rowsAffected > 0) {
-                    readReminderData()
-                } else alert('Updation Failed');
+                var len = results.rows.length;
+                console.log('len', len);
+                if (len > 0) {
+                    console.log("data: " + results.rows.item(0).reminder);
+                    setReminder(results.rows.item(0).reminder + " Minutes")
+                    showNotification(results.rows.item(0).reminder)
+                    showDrinkPopup(results.rows.item(0).reminder)
+                    updateReminderSchedule()
+                } else {
+                  alert('No user found');
+                }
               }
             );
           });
-    }
+}
     
 
     const changeValue = (type, value) => {

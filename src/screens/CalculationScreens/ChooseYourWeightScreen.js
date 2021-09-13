@@ -2,11 +2,9 @@ import React, {useState} from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 import WheelPicker from 'react-native-wheely';
 
-import NextButton from '../../components/NextButton'
-import Images from '../../assets/images';
-import Colors from '../../assets/colors';
-import Strings from '../../assets/strings'
+import { NextButton, CommonHeader } from '../../components'
 import { getArrayTime } from '../../utills/UtillFunctions';
+import { Images, Colors, Styles, Strings } from '../../assets';
 
 const ChooseYourWeightScreen = ({navigation, route}) => {
 
@@ -22,8 +20,8 @@ const ChooseYourWeightScreen = ({navigation, route}) => {
 
     return (
         <View style={{flex:1}}>
-            <Text style={styles.headerStyle}>{Strings.Choose_Your_Weight}</Text>
-            <View style={styles.chooseWeightContainer}>
+            <CommonHeader headerText={Strings.Choose_Your_Weight} />
+            <View style={Styles.chooseTimeContainer}>
                 <Image style={styles.imgStyle} source={imgChooseWight} />
                 <View style={styles.wheelContainerStyle}>
                     <WheelPicker
@@ -47,19 +45,6 @@ const ChooseYourWeightScreen = ({navigation, route}) => {
 }
 
 const styles = StyleSheet.create({
-    headerStyle:{
-        alignSelf:'center', 
-        marginTop:20, 
-        fontSize:18, 
-        fontWeight:'bold'
-    },
-    chooseWeightContainer:{
-        alignSelf:'center', 
-        flex:0.9, 
-        justifyContent:'center', 
-        alignItems:'center',
-        flexDirection:'row'
-    },
     wheelItemStyle:{
         fontSize:25, 
         color:Colors.primary

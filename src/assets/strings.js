@@ -13,8 +13,7 @@ const Strings = {
    Choose_Your_Gender:"Choose Your Gender",
    Choose_Your_Weight:"Choose Your Weight",
    Choose_Your_Wake_Up_Time:"Choose Your Wake Up Time",
-   Choose_Your_Sleeping_Time:"Choose Your Sleeping Time",
-   
+   Choose_Your_Sleeping_Time:"Choose Your Sleeping Time"
 }
 
 export default Strings

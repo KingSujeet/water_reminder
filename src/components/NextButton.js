@@ -1,8 +1,7 @@
 import React from 'react'
 import { View, TouchableOpacity, Text, StyleSheet} from 'react-native'
 
-import Colors from '../assets/colors'
-import Strings from '../assets/strings'
+import { Colors, Strings } from '../assets'
 
 const NextButton = ({ onPressTouch }) => {
     return (

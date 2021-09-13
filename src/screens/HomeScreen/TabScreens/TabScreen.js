@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useWindowDimensions } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 
 import HomeTab from './HomeTab';
-import Strings from '../../../assets/strings';
 import SettingTab from './SettingTab';
+import { Strings } from '../../../assets';
 
   const renderScene = SceneMap({
     home: HomeTab,

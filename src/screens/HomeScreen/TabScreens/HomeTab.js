@@ -3,10 +3,8 @@ import { Text, View, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView
 import Svg, { Circle } from 'react-native-svg';
 import { openDatabase } from 'react-native-sqlite-storage';
 
-import Colors from '../../../assets/colors';
-import Images from '../../../assets/images';
-import Strings from '../../../assets/strings';
-
+import { Colors, Images, Strings } from '../../../assets';
+import { updateTableData } from '../../../db/DbFunctions';
 
 var db = openDatabase({ name: 'UserDatabase.db' });
 const WAVE_HEIGHT = 160
@@ -101,17 +99,25 @@ const HomeTab = () => {
     
 
     const addWaterAmount = (value) => {
-        db.transaction((tx) => {
-            tx.executeSql(
-              'UPDATE table_user set consumed_water_amount=?, water_amount=?',
-              [(consumedWater+200), value],
-              (tx, results) => {
-                console.log('Results', results.rowsAffected);
-                if (results.rowsAffected > 0) {
-                } else alert('Updation Failed');
-              }
-            );
-          });
+        // db.transaction((tx) => {
+        //     tx.executeSql(
+        //       'UPDATE table_user set consumed_water_amount=?, water_amount=?',
+        //       [(consumedWater+200), value],
+        //       (tx, results) => {
+        //         console.log('Results', results.rowsAffected);
+        //         if (results.rowsAffected > 0) {
+        //         } else alert('Updation Failed');
+        //       }
+        //     );
+        //   });
+
+        updateTableData(
+         'UPDATE table_user set consumed_water_amount=?, water_amount=?',
+         [(consumedWater+200), value]
+         ).then(()=>{
+            
+        })
+  
           readDbData()
           createItemListTable()
           insertListTable(200)

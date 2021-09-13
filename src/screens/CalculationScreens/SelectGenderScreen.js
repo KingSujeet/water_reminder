@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
-import Strings from '../../assets/strings'
 
-import NextButton from '../../components/NextButton'
-import Images from '../../assets/images'
+import { NextButton, CommonHeader } from '../../components'
+import { Images, Strings } from '../../assets'
 
 const SelectYourGender = ({navigation}) => {
 
@@ -23,7 +22,7 @@ const SelectYourGender = ({navigation}) => {
 
     return (
         <View style={{flex:1}}>
-            <Text style={styles.headerStyle}>{Strings.Choose_Your_Gender}</Text>
+            <CommonHeader headerText={Strings.Choose_Your_Gender} />
             <View style={styles.selectGenderContainer}>
                 { gender === "female" ?                 
                         <View style={{flexDirection:'row'}}>
@@ -60,6 +59,7 @@ const SelectYourGender = ({navigation}) => {
     )
 }
 
+
 /**
  * GenderSelect component
  */
@@ -74,12 +74,6 @@ const GenderSelect = ({image, onPress=()=>{}, gender}) => {
 }
 
 const styles = StyleSheet.create({
-    headerStyle:{
-        alignSelf:'center', 
-        marginTop:20, 
-        fontSize:18, 
-        fontWeight:'bold'
-    },
     genderImageStyle:{
         width:120, 
         height:120, 

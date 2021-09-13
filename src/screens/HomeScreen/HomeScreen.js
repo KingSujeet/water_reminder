@@ -1,50 +1,67 @@
 import React, { useEffect } from 'react'
-import { Alert } from 'react-native'
-import PushNotification from 'react-native-push-notification'
+import { openDatabase } from 'react-native-sqlite-storage';
 
+import { updateTableData } from '../../db/DbFunctions';
+import { showDrinkPopup, showNotification } from '../../utills/UtillFunctions';
 import TabScreen from './TabScreens/TabScreen'
+
+var db = openDatabase({ name: 'UserDatabase.db' });
 
 const HomeScreen = () => {
 
-    const showDrinkPopup = () => {
-        console.log('its drink time');
-        Alert.alert(
-            'Its Drink Water Time',
-            'Now, its time to hydrate your self',
-            [
-              {
-                text: 'Ok',
-                onPress: () => {},
-              },
-            ],
-            { cancelable: false }
-          );
+  var reminderTime = 5
+
+    const updateReminderSchedule = () => {
+      // db.transaction((tx) => {
+      //   tx.executeSql(
+      //     'UPDATE table_user set is_reminder_sch=?',
+      //     ['true'],
+      //     (tx, results) => {
+      //       console.log('Results', results.rowsAffected);
+      //       if (results.rowsAffected > 0) {
+      //       } else alert('Updation Failed');
+      //     }
+      //   );
+      // });
+
+      updateTableData('UPDATE table_user set is_reminder_sch=?', ['true'])
+      .then(()=>{
+          alert('success ')
+      })
+
     }
+    
 
-    const showNotification = () => {
-
-      PushNotification.localNotificationSchedule({
-        //... You can use all the options from localNotifications
-        id:123,
-        message: "My Notification Message", // (required)
-        date: new Date(Date.now()), // in 60 secs
-        allowWhileIdle: false, // (optional) set notification to work while on doze, default: false
-      
-        /* Android Only Properties */
-        repeatTime: 5, // (optional) Increment of configured repeatType. Check 'Repeating Notifications' section for more info.
-        repeatType: 'minute',
-      });
+    const readReminderTime = () => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          'SELECT reminder, is_reminder_sch FROM table_user',
+          [],
+          (tx, results) => {
+            var len = results.rows.length;
+            console.log('len', len);
+            if (len > 0) {
+                console.log("data: " + results.rows.item(0).reminder);
+                reminderTime = results.rows.item(0).reminder
+                console.log("reminder: " + reminderTime)
+                if(results.rows.item(0).is_reminder_sch === 'true'){
+                }
+                else{
+                  showNotification(reminderTime)
+                  updateReminderSchedule()
+                  showDrinkPopup(reminderTime)
+                }   
+            } else {
+              alert('No user found');
+            }
+          }
+        );
+      });  
 
     }
     
     useEffect(() => {
-        // setInterval(() => {
-        //   //  showNotification()
-        // }, 10000);
-
-         showNotification()
-       
-   
+        readReminderTime()    
      }, []);
 
     return (
