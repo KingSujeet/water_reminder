@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 
-import { NextButton, CommonHeader } from '../../components'
-import { Images, Strings } from '../../assets'
+import { NextButton, CommonHeader } from '../../components' // custom components
+import { Images, Strings } from '../../assets'  // resources
 
 const SelectYourGender = ({navigation}) => {
 
-    const [ gender, setGender ] = useState('male')
+    const [ gender, setGender ] = useState(Strings.male)
 
+    // onPress event
     const goToChooseWeightScreen = () => {
         navigation.navigate('ChooseYourWeightScreen',{genderType:gender})
     }
     
     const selectGender = () => {
-        if(gender === 'female')
-            setGender('male')
+        if(gender === Strings.female)
+            setGender(Strings.male)
         else
-            setGender('female')  
+            setGender(Strings.female)  
     }
     
 
@@ -24,16 +25,16 @@ const SelectYourGender = ({navigation}) => {
         <View style={{flex:1}}>
             <CommonHeader headerText={Strings.Choose_Your_Gender} />
             <View style={styles.selectGenderContainer}>
-                { gender === "female" ?                 
+                { gender === Strings.female ?                 
                         <View style={{flexDirection:'row'}}>
                             <GenderSelect 
                                 image={Images.maleSelectedImage}
-                                gender='Male'
+                                gender={Strings.Male}
                             />
                              <GenderSelect 
                                 image={Images.femaleImage}
                                 onPress={()=>{ selectGender() }}
-                                gender='Female'
+                                gender={Strings.Female}
                             />
                         </View>
 
@@ -42,11 +43,11 @@ const SelectYourGender = ({navigation}) => {
                             <GenderSelect 
                                 image={Images.maleImage}
                                 onPress={()=>{ selectGender() }}
-                                gender='Male'
+                                gender={Strings.Male}
                             />
                              <GenderSelect 
                                 image={Images.femaleSelectedImage}
-                                gender='Female'
+                                gender={Strings.Female}
                             />
                         </View>
                 }
@@ -63,7 +64,7 @@ const SelectYourGender = ({navigation}) => {
 /**
  * GenderSelect component
  */
-const GenderSelect = ({image, onPress=()=>{}, gender}) => {
+const GenderSelect = ({image='', onPress=()=>{}, gender=''}) => {
     
     return(
         <TouchableOpacity onPress={()=> onPress()}>

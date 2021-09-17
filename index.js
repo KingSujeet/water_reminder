@@ -6,7 +6,6 @@ import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import PushNotification from 'react-native-push-notification'
-import BackgroundFetch from 'react-native-background-fetch';
 
  PushNotification.configure({
 
@@ -17,6 +16,7 @@ import BackgroundFetch from 'react-native-background-fetch';
   // (required) Called when a remote is received or opened, or local notification is opened
   onNotification: function (notification) {
     console.log("NOTIFICATION:", notification);
+    alert('hii i am a notification')
   },
 
   // IOS ONLY (optional): default: all - Permissions to register.
@@ -26,7 +26,7 @@ import BackgroundFetch from 'react-native-background-fetch';
     sound: true,
   },
 
-popInitialNotification: true,
+popInitialNotification: false,
 requestPermissions: true,
 requestPermissions: Platform.OS === 'ios',
 });

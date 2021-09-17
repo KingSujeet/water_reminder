@@ -2,9 +2,9 @@ import React from 'react'
 import { useWindowDimensions } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 
-import HomeTab from './HomeTab';
-import SettingTab from './SettingTab';
-import { Strings } from '../../../assets';
+import HomeTab from './HomeTab';  // HomeTab screens
+import SettingTab from './SettingTab';  // SettingTab screens
+import { Strings } from '../../../assets'; //resources
 
   const renderScene = SceneMap({
     home: HomeTab,

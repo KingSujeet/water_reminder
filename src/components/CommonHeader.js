@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text } from 'react-native'
 
-const CommonHeader = ({headerText}) => {
+const CommonHeader = ({headerText=''}) => {
     return (
         <Text style={styles.headerStyle}>{headerText}</Text>
     )

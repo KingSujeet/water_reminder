@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet} from 'react-native'
 
 import { Colors, Strings } from '../assets'
 
-const NextButton = ({ onPressTouch }) => {
+const NextButton = ({ onPressTouch =()=>{} }) => {
     return (
         <TouchableOpacity style={styles.btnStyle} onPress={ onPressTouch } >
             <View style={styles.btnInnerStyle}>

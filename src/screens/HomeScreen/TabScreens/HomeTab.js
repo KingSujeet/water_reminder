@@ -1,16 +1,15 @@
 import React, { useState, useEffect} from 'react'
-import { Text, View, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView, ScrollView } from 'react-native'
+import { Text, View, StyleSheet, FlatList, TouchableOpacity, Image, ScrollView } from 'react-native'
 import Svg, { Circle } from 'react-native-svg';
-import { openDatabase } from 'react-native-sqlite-storage';
 
-import { Colors, Images, Strings } from '../../../assets';
-import { updateTableData } from '../../../db/DbFunctions';
+import { Colors, Images, Strings } from '../../../assets';  // resources
+import { updateTableData, insertTableData, readfTableData, createTable } from '../../../db/DbCrudFunctions'; // db functions
+import Queries from '../../../db/DbQueries';
 
-var db = openDatabase({ name: 'UserDatabase.db' });
 const WAVE_HEIGHT = 160
 
 const HomeTab = () => {
-
+    // states
     const [ waterAmount, setWaterAmount ] = useState(0)
     const [ consumedWater, setConsumedWater ] = useState(null)
     const [ dailydWaterAmount, setDailyWaterAmount ] = useState(null)
@@ -18,64 +17,53 @@ const HomeTab = () => {
 
     const waterAmountPercentage = waterAmount*WAVE_HEIGHT/100
 
+    // reading data from table_user
     const readDbData = () => {
-        db.transaction((tx) => {
-            tx.executeSql(
-              'SELECT consumed_water_amount, daily_water_amount, water_amount FROM table_user',
-              [],
-              (tx, results) => {
-                var len = results.rows.length;
-                console.log('len', len);
-                if (len > 0) {
-                    console.log("data: " + results.rows.item(0).consumed_water_amount);
-                    setConsumedWater(results.rows.item(0).consumed_water_amount)
-                    setDailyWaterAmount(results.rows.item(0).daily_water_amount)
-                    setWaterAmount(results.rows.item(0).water_amount)
-                    console.log("water amount: "+waterAmount)
-                } else {
-                  alert('No user found');
-                }
-              }
-            );
-          });
+
+          readfTableData(
+            Queries.select_consumed_water_amount_daily_water_amount_water_amount
+            ).then((results)=>{
+                console.log("data: " + results.rows.item(0).consumed_water_amount);
+                let consumed_water_amount = results.rows.item(0).consumed_water_amount
+                let daily_water_amount = results.rows.item(0).daily_water_amount
+                let water_amount = results.rows.item(0).water_amount
+                setConsumedWater(consumed_water_amount)
+                setDailyWaterAmount(daily_water_amount)
+                setWaterAmount(water_amount)
+                console.log("water amount: "+waterAmount)
+    
+            }).catch(()=>{ console.log('no data found') })
 
     }
 
+    // creating record_list table 
     const createItemListTable = () => {
-        db.transaction(function (txn) {
-            txn.executeSql(
-              "SELECT name FROM sqlite_master WHERE type='table' AND name='record_list'",
-              [],
-              function (tx, res) {
-                console.log('item:', res.rows.length);
-                if (res.rows.length == 0) {
-                  txn.executeSql('DROP TABLE IF EXISTS record_list', []);
-                  txn.executeSql(
-                    'CREATE TABLE IF NOT EXISTS record_list(id INTEGER PRIMARY KEY AUTOINCREMENT, time_of_drink VARCHAR(5), consumed_water_amount INT(5))',
-                    []
-                  );
-                }
-              }
-            );
-          });
+
+          createTable(
+            Queries.select_record_list_table,
+            Queries.drop_record_list,
+            Queries.create_record_list_table
+          ).then(()=>{
+            console.log('table created successfully')
+          })
     }
 
+    // reading list from record_list table
     const readAllItemList = () => {
-        db.transaction((tx) => {
-            tx.executeSql(
-              'SELECT * FROM record_list',
-              [],
-              (tx, results) => {
+
+          readfTableData(
+            Queries.select_lis_from_record_list,
+            ).then((results)=>{
                 var temp = [];
                 for (let i = 0; i < results.rows.length; ++i)
                   temp.push(results.rows.item(i));
                 setWaterList(temp);
-              }
-            );
-          });
+    
+            }).catch(()=>{ console.log('no data found') })
     }
     
     
+    // inserting data to record_list table
     const insertListTable = (value) => {
 
         var hours = new Date().getHours(); //Current Hours
@@ -83,45 +71,27 @@ const HomeTab = () => {
         console.log("current time: ", hours+":"+min);
 
         const currentTime = (min>=0 && min<10)? hours+":0"+min : hours+":"+min
-        db.transaction(function (tx) {
-            tx.executeSql(
-              'INSERT INTO record_list ( time_of_drink, consumed_water_amount) VALUES (?,?)',
-              [currentTime, value],
-              (tx, results) => {
-                console.log('Results', results.rowsAffected);
-                if (results.rowsAffected > 0) {
-                 
-                } else alert('db Failed to save');
-              }
-            );
-          });
+
+          insertTableData(
+             Queries.insert_data_into_record_list_table,
+             [currentTime, value])
+          .then(()=>{
+           
+          })
     }
     
 
     const addWaterAmount = (value) => {
-        // db.transaction((tx) => {
-        //     tx.executeSql(
-        //       'UPDATE table_user set consumed_water_amount=?, water_amount=?',
-        //       [(consumedWater+200), value],
-        //       (tx, results) => {
-        //         console.log('Results', results.rowsAffected);
-        //         if (results.rowsAffected > 0) {
-        //         } else alert('Updation Failed');
-        //       }
-        //     );
-        //   });
 
         updateTableData(
-         'UPDATE table_user set consumed_water_amount=?, water_amount=?',
+         Queries.update_consumed_water_amount_and_water_amount,
          [(consumedWater+200), value]
          ).then(()=>{
-            
-        })
-  
-          readDbData()
-          createItemListTable()
-          insertListTable(200)
-          readAllItemList()
+            readDbData()
+            createItemListTable()
+            insertListTable(200)
+            readAllItemList()
+        })   
     }
     
     
@@ -188,7 +158,7 @@ const waterRecordItem = ({item}) => {
  * WaterFill component
  */
 
-const WaterFillComponent = ({waterAmountPercentage, waterAmount, consumedWater, dailydWaterAmount ,onCallBack}) =>{
+const WaterFillComponent = ({waterAmountPercentage = '', waterAmount = '', consumedWater='', dailydWaterAmount='',onCallBack =()=>{}}) =>{
     return(
         <View>
             <View style={_styles.outerCircle}>

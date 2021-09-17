@@ -2,18 +2,20 @@ import React, {useState} from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 import WheelPicker from 'react-native-wheely';
 
-import { NextButton, CommonHeader } from '../../components'
-import { getArrayTime } from '../../utills/UtillFunctions';
-import { Images, Colors, Styles, Strings } from '../../assets';
+import { NextButton, CommonHeader } from '../../components'  // custom components
+import { generateArray } from '../../utills/UtillFunctions';  // utility functions
+import { Images, Colors, Styles, Strings } from '../../assets'; // resources
 
 const ChooseYourWeightScreen = ({navigation, route}) => {
 
     const genderType = route.params.genderType
-    const arrayOfWeight = getArrayTime(20,150)
-    const imgChooseWight = ( genderType === "female") ? Images.chooseWeightMale: Images.chooseWeightFemale 
+    const arrayOfWeight = generateArray(20,150)
+    const imgChooseWight = ( genderType === Strings.female) ? Images.chooseWeightMale: Images.chooseWeightFemale 
 
     const [selected, setSelectedIndex] = useState(40);
     const weight = arrayOfWeight[selected]
+
+    // onPress event
     const goToChooseWakeTimeScreen = () => {
         navigation.navigate('ChooseWakeTimeScreen', { genderType:genderType, weight:weight})
     }

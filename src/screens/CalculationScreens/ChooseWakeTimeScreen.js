@@ -1,24 +1,25 @@
 import React, {useState} from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, StyleSheet, Image } from 'react-native'
 import WheelPicker from 'react-native-wheely';
 
-import { NextButton, CommonHeader } from '../../components'
-import { getArrayTime } from '../../utills/UtillFunctions';
-import { Styles, Images, Strings } from '../../assets';
+import { NextButton, CommonHeader } from '../../components' // custom components
+import { generateArray } from '../../utills/UtillFunctions'; // utility functions
+import { Styles, Images, Strings } from '../../assets';  // resources
 
 const ChooseWakeTimeScreen = ({navigation, route}) => {
 
     const genderType = route.params.genderType
-    const imgWakeUpTime = ( genderType === "female") ? Images.wakeUpTime: Images.wakeUpTimeFemale 
+    const imgWakeUpTime = ( genderType === Strings.female) ? Images.wakeUpTime: Images.wakeUpTimeFemale 
 
-    const arrayOfHour = getArrayTime(0,23)
-    const arrayOfMin = getArrayTime(0,59)
+    const arrayOfHour = generateArray(0,23)
+    const arrayOfMin = generateArray(0,59)
 
     const [selectedHour, setSelectedhourIndex] = useState(0);
     const [selectedMin, setSelectedminIndex] = useState(0);
 
     const wakeUpTimeValue = arrayOfHour[selectedHour] + " : " + arrayOfMin[selectedMin]
 
+    // onPress event 
     const goToChooseSleepTimeScreen = () => {
         navigation.navigate('ChooseSleepingTimeScreen',{
             genderType: genderType, 

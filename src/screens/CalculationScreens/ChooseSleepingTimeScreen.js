@@ -1,53 +1,43 @@
 import React, {useState} from 'react'
 import { View, StyleSheet, Image, Alert } from 'react-native'
 import WheelPicker from 'react-native-wheely';
-import { openDatabase } from 'react-native-sqlite-storage';
 
-import { NextButton, CommonHeader } from '../../components'
-import { getArrayTime } from '../../utills/UtillFunctions';
-import { Styles, Images, Strings } from '../../assets';
-
-var db = openDatabase({ name: 'UserDatabase.db' });
+import { NextButton, CommonHeader } from '../../components' // custom components
+import { generateArray, showAlert } from '../../utills/UtillFunctions'; // utility functions
+import { Styles, Images, Strings } from '../../assets';  // resources
+import { insertTableData } from '../../db/DbCrudFunctions';  // db functions
+import Queries from '../../db/DbQueries';
 
 const ChooseSleepingTimeScreen = ({navigation, route}) => {
 
     const genderType = route.params.genderType
     const weight = route.params.weight
     const wakeUpTime  = route.params.wakeUpTime
-    const imgSleepTime = ( genderType === "female") ? Images.sleepTime: Images.sleepTimeWomen 
+    const imgSleepTime = ( genderType === Strings.female) ? Images.sleepTime: Images.sleepTimeWomen 
 
-    const arrayOfHour = getArrayTime(0,23)
-    const arrayOfMin = getArrayTime(0,59)
+    const arrayOfHour = generateArray(0,23)
+    const arrayOfMin = generateArray(0,59)
 
     const [selectedHour, setSelectedhourIndex] = useState(0);
     const [selectedMin, setSelectedminIndex] = useState(0);
 
     const sleepingTimeValue = arrayOfHour[selectedHour] + " : " + arrayOfMin[selectedMin]
 
+    // onPress event
     const goToHomeScreen = () => {
+
         var d1 = new Date().getDate()
-        db.transaction(function (tx) {
-            tx.executeSql(
-              'INSERT INTO table_user (daily_water_amount, consumed_water_amount, water_amount, reminder, is_reminder_sch, wake_up_time, sleeping_time, today_date ) VALUES (?,?,?,?,?,?,?,?)',
-              [(weight*33), 0, 0, 30, 'false', wakeUpTime, sleepingTimeValue, d1],
-              (tx, results) => {
-                console.log('Results', results.rowsAffected);
-                if (results.rowsAffected > 0) {
-                  Alert.alert(
-                    'Success',
-                    'Tap on ok!',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => navigation.reset({ index: 0,routes: [{name: 'Home'}], }),
-                      },
-                    ],
-                    { cancelable: false }
-                  );
-                } else console.log('db Failed to save');
-              }
-            );
-          });
+        const query = Queries.insert_data_to_table_user_table
+
+        // insert table data function
+        insertTableData(query,
+        [(weight*33), 0, 0, 30, 'false', wakeUpTime, sleepingTimeValue, d1])
+        .then(()=>{
+            showAlert(Strings.Success, Strings.success_alert_msg, 
+                ()=>{ navigation.reset({ index: 0,routes: [{name: 'Home'}], })
+             })
+        })
+
     }
 
     return (
